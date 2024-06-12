@@ -196,4 +196,30 @@ public class EmployeeRepositoryTest {
         Optional<Employee> deletedEmployeeOptional = employeeRepository.findById(employee.getId());
         assertThat(deletedEmployeeOptional).isEmpty();
     }
+    @Test
+    @DisplayName("JUnit test for custom query method with index parameters")
+    public void givenLastName_whenFindByLastNameLike_thenEmployeesFound() {
+        // given - precondition or setup
+        Employee employee1 = Employee.builder()
+                .firstname("Oguz")
+                .lastname("Karadag")
+                .email("karadagoguzkaan@gmail.com")
+                .build();
+        Employee employee2 = Employee.builder()
+                .firstname("Selcuk")
+                .lastname("Karadag")
+                .email("karadagselcuk@gmail.com")
+                .build();
+        employeeRepository.save(employee1);
+        employeeRepository.save(employee2);
+
+        // when - action or behavior that we are going to test
+        String lastNamePattern = "Karadag";
+        List<Employee> foundEmployees = employeeRepository.findByLastnameLike(lastNamePattern);
+
+        // then - verify the output
+        assertThat(foundEmployees).isNotEmpty();
+        assertThat(foundEmployees).hasSize(2);
+        assertThat(foundEmployees).contains(employee1, employee2);
+    }
 }
