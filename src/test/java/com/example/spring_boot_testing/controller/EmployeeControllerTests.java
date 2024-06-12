@@ -13,9 +13,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -60,5 +64,24 @@ public class EmployeeControllerTests {
                         is(employee.getLastname()))) // Adjusted field name
                 .andExpect(jsonPath("$.email", // Corrected JSON path
                         is(employee.getEmail()))); // Adjusted field name
+    }
+    @Test
+    @DisplayName("JUnit test for Get All employees REST API")
+    public void givenListOfEmployees_whenGetAllEmployees_thenReturnEmployeesList() throws Exception{
+        // given - precondition or setup
+        List<Employee> listOfEmployees = new ArrayList<>();
+        listOfEmployees.add(Employee.builder().firstname("Ramesh").lastname("Fadatare").email("ramesh@gmail.com").build());
+        listOfEmployees.add(Employee.builder().firstname("Tony").lastname("Stark").email("tony@gmail.com").build());
+        given(employeeService.getAllEmployees()).willReturn(listOfEmployees);
+
+        // when -  action or the behaviour that we are going test
+        ResultActions response = mockMvc.perform(get("/api/employees"));
+
+        // then - verify the output
+        response.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.size()",
+                        is(listOfEmployees.size())));
+
     }
 }
