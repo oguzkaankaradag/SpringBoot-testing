@@ -146,4 +146,36 @@ public class EmployeeRepositoryTest {
         assertThat(foundEmployee.get().getLastname()).isEqualTo(employee.getLastname());
         assertThat(foundEmployee.get().getEmail()).isEqualTo(employee.getEmail());
     }
+    @Test
+    @DisplayName("JUnit test for updating employee")
+    public void givenEmployee_whenUpdate_thenEmployeeUpdated() {
+        // given - precondition or setup
+        Employee employee = Employee.builder()
+                .firstname("Oguz")
+                .lastname("Karadag")
+                .email("karadagoguzkaan@gmail.com")
+                .build();
+        employeeRepository.save(employee);
+
+        // when - action or behavior that we are going to test
+        employee.setFirstname("UpdatedName");
+        employee.setLastname("UpdatedLastName");
+        employee.setEmail("updated.email@example.com");
+        employeeRepository.save(employee);
+
+        // then - verify the output
+        Optional<Employee> updatedEmployeeOptional = employeeRepository.findById(employee.getId());
+        assertThat(updatedEmployeeOptional).isPresent();
+        Employee updatedEmployee = updatedEmployeeOptional.get();
+
+        // Additional assertions
+        assertThat(updatedEmployee.getId()).isEqualTo(employee.getId()); // ID remains unchanged
+        assertThat(updatedEmployee.getFirstname()).isEqualTo("UpdatedName");
+        assertThat(updatedEmployee.getLastname()).isEqualTo("UpdatedLastName");
+        assertThat(updatedEmployee.getEmail()).isEqualTo("updated.email@example.com");
+
+        // Check that there is only one employee in the database
+        long count = employeeRepository.count();
+        assertThat(count).isEqualTo(1);
+    }
 }
