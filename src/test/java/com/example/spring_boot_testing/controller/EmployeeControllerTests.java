@@ -20,8 +20,7 @@ import java.util.Optional;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -131,4 +130,39 @@ public class EmployeeControllerTests {
                 .andDo(print());
 
     }
+
+    @Test
+    @DisplayName("JUnit test for update employee REST API - positive scenario")
+    public void givenUpdatedEmployee_whenUpdateEmployee_thenReturnUpdateEmployeeObject() throws Exception{
+        // given - precondition or setup
+        long employeeId = 1L;
+        Employee savedEmployee = Employee.builder()
+                .firstname("Oguz")
+                .lastname("KARADAG")
+                .email("karadagoguzkaan@gmail.com")
+                .build();
+
+        Employee updatedEmployee = Employee.builder()
+                .firstname("Selcuk")
+                .lastname("KARADAG")
+                .email("karadagselcuk@gmail.com")
+                .build();
+        given(employeeService.getEmployeeById(employeeId)).willReturn(Optional.of(savedEmployee));
+        given(employeeService.updateEmployee(any(Employee.class)))
+                .willAnswer((invocation)-> invocation.getArgument(0));
+
+        // when -  action or the behaviour that we are going test
+        ResultActions response = mockMvc.perform(put("/api/employees/{id}", employeeId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updatedEmployee)));
+
+
+        // then - verify the output
+        response.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.firstname", is(updatedEmployee.getFirstname())))
+                .andExpect(jsonPath("$.lastname", is(updatedEmployee.getLastname())))
+                .andExpect(jsonPath("$.email", is(updatedEmployee.getEmail())));
+    }
+
 }
