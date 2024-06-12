@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -83,5 +84,29 @@ public class EmployeeControllerTests {
                 .andExpect(jsonPath("$.size()",
                         is(listOfEmployees.size())));
 
+    }
+
+    // positive scenario - valid employee id
+    @Test
+    @DisplayName("JUnit test for GET employee by id REST API")
+    public void givenEmployeeId_whenGetEmployeeById_thenReturnEmployeeObject() throws Exception{
+        // given - precondition or setup
+        long employeeId = 1L;
+        Employee employee = Employee.builder()
+                .firstname("Oguz")
+                .lastname("KARADAG")
+                .email("karadagoguzkaan@gmail.com")
+                .build();
+        given(employeeService.getEmployeeById(employeeId)).willReturn(Optional.of(employee));
+
+        // when -  action or the behaviour that we are going test
+        ResultActions response = mockMvc.perform(get("/api/employees/{id}", employeeId));
+
+        // then - verify the output
+        response.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.firstname", is(employee.getFirstname()))) // Corrected JSON path
+                .andExpect(jsonPath("$.lastname", is(employee.getLastname()))) // Corrected JSON path
+                .andExpect(jsonPath("$.email", is(employee.getEmail()))); // Corrected JSON path
     }
 }
