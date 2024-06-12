@@ -1,5 +1,6 @@
 package com.example.spring_boot_testing.service;
 
+import com.example.spring_boot_testing.exception.ResourceNotFoundException;
 import com.example.spring_boot_testing.model.Employee;
 import com.example.spring_boot_testing.repository.EmployeeRepository;
 import com.example.spring_boot_testing.service.impl.EmployeeServiceImpl;
@@ -14,7 +15,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class EmployeeServiceTests {
@@ -58,6 +62,25 @@ public class EmployeeServiceTests {
         System.out.println(savedEmployee);
         // then - verify the output
         assertThat(savedEmployee).isNotNull();
+    }
+    // JUnit test for saveEmployee method
+    @DisplayName("JUnit test for saveEmployee method which throws exception")
+    @Test
+    public void givenExistingEmail_whenSaveEmployee_thenThrowsException(){
+        // given - precondition or setup
+        given(employeeRepository.findByEmail(employee.getEmail()))
+                .willReturn(Optional.of(employee));
+
+        System.out.println(employeeRepository);
+        System.out.println(employeeService);
+
+        // when -  action or the behaviour that we are going test
+        org.junit.jupiter.api.Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            employeeService.saveEmployee(employee);
+        });
+
+        // then
+        verify(employeeRepository, never()).save(any(Employee.class));
     }
 
 
