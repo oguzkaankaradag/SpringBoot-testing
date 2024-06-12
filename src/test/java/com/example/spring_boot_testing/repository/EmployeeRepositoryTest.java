@@ -178,4 +178,22 @@ public class EmployeeRepositoryTest {
         long count = employeeRepository.count();
         assertThat(count).isEqualTo(1);
     }
+    @Test
+    @DisplayName("JUnit test for deleting employee")
+    public void givenEmployeeId_whenDelete_thenEmployeeDeleted() {
+        // given - precondition or setup
+        Employee employee = Employee.builder()
+                .firstname("Oguz")
+                .lastname("Karadag")
+                .email("karadagoguzkaan@gmail.com")
+                .build();
+        employeeRepository.save(employee);
+
+        // when - action or behavior that we are going to test
+        employeeRepository.delete(employee);
+
+        // then - verify the output
+        Optional<Employee> deletedEmployeeOptional = employeeRepository.findById(employee.getId());
+        assertThat(deletedEmployeeOptional).isEmpty();
+    }
 }
