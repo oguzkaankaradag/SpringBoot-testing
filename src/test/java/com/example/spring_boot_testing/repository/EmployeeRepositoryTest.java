@@ -124,4 +124,26 @@ public class EmployeeRepositoryTest {
         Optional<Employee> nonExistingEmployee = employeeRepository.findById(-1L);
         assertThat(nonExistingEmployee).isEmpty();
     }
+    @Test
+    @DisplayName("JUnit test for finding employee by email")
+    public void givenEmployeeEmail_whenFindByEmail_thenReturnEmployee() {
+
+        // given - precondition or setup
+        Employee employee = Employee.builder()
+                .firstname("Oguz")
+                .lastname("Karadag")
+                .email("karadagoguzkaan@gmail.com")
+                .build();
+        employeeRepository.save(employee);
+
+        // when - action or behavior that we are going to test
+        Optional<Employee> foundEmployee = employeeRepository.findByEmail("karadagoguzkaan@gmail.com");
+
+        // then - verify the output
+        assertThat(foundEmployee).isPresent();
+        assertThat(foundEmployee.get().getId()).isEqualTo(employee.getId());
+        assertThat(foundEmployee.get().getFirstname()).isEqualTo(employee.getFirstname());
+        assertThat(foundEmployee.get().getLastname()).isEqualTo(employee.getLastname());
+        assertThat(foundEmployee.get().getEmail()).isEqualTo(employee.getEmail());
+    }
 }
