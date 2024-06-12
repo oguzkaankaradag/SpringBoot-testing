@@ -3,16 +3,19 @@ package com.example.spring_boot_testing.repository;
 import com.example.spring_boot_testing.model.Employee;
 import org.assertj.core.api.Assertions;
 import org.hibernate.exception.ConstraintViolationException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
@@ -20,6 +23,23 @@ public class EmployeeRepositoryTest {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+
+    @BeforeEach
+    public void setUp() {
+        Employee employee1 = Employee.builder()
+                .firstname("Oguz")
+                .lastname("Karadag")
+                .email("karadagoguzkaan@gmail.com")
+                .build();
+        employeeRepository.save(employee1);
+
+        Employee employee2 = Employee.builder()
+                .firstname("Selcuk")
+                .lastname("Karadag")
+                .email("karadagselcuk@gmail.com")
+                .build();
+        employeeRepository.save(employee2);
+    }
 
     //JUnit test for save employee operation
     @DisplayName("JUnit test for save employee operation")
@@ -32,6 +52,8 @@ public class EmployeeRepositoryTest {
                 .lastname("karadag")
                 .email("karadagoguzkaan@gmail.com")
                 .build();
+
+
 
         //when - action or behavior that we are going test
         Employee savedEmployee = employeeRepository.save(employee);
@@ -248,4 +270,17 @@ public class EmployeeRepositoryTest {
         assertThat(foundEmployees).hasSize(1);
         assertThat(foundEmployees.get(0)).isEqualTo(employee1);
     }
+    @Test
+    @DisplayName("JUnit test cases for EmployeeRepository's custom native query method to find employees by last name")
+    public void givenEmployeesWithSameLastName_whenFindEmployeesByLastNameWithNativeQuery_thenReturnsCorrectEmployees() {
+
+        // When
+        List<Employee> employees = employeeRepository.findEmployeesByLastNameWithNativeQuery("Karadag");
+
+        // Then
+        assertEquals(2, employees.size());
+        assertEquals("Oguz", employees.get(0).getFirstname());
+        assertEquals("Selcuk", employees.get(1).getFirstname());
+    }
+
 }
