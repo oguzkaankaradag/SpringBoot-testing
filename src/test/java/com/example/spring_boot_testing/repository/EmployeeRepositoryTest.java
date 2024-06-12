@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -95,5 +96,32 @@ public class EmployeeRepositoryTest {
         assertThat(retrievedEmployee2.getFirstname()).isEqualTo("John");
         assertThat(retrievedEmployee2.getLastname()).isEqualTo("Doe");
         assertThat(retrievedEmployee2.getEmail()).isEqualTo("john.doe@example.com");
+    }
+    @Test
+    @DisplayName("JUnit test for finding employee by ID")
+    public void givenEmployeeId_whenFindById_thenReturnEmployee() {
+
+        // given - precondition or setup
+        Employee employee = Employee.builder()
+                .firstname("Oguz")
+                .lastname("Karadag")
+                .email("karadagoguzkaan@gmail.com")
+                .build();
+        employeeRepository.save(employee);
+
+        // when - action or behavior that we are going test
+        Optional<Employee> foundEmployee = employeeRepository.findById(employee.getId());
+
+        // then - verify the output
+        assertThat(foundEmployee).isPresent();
+        assertThat(foundEmployee.get().getId()).isEqualTo(employee.getId());
+        assertThat(foundEmployee.get().getFirstname()).isEqualTo(employee.getFirstname());
+        assertThat(foundEmployee.get().getLastname()).isEqualTo(employee.getLastname());
+        assertThat(foundEmployee.get().getEmail()).isEqualTo(employee.getEmail());
+
+        // Additional assertions
+        // Test retrieving an employee with a non-existing ID returns an empty optional
+        Optional<Employee> nonExistingEmployee = employeeRepository.findById(-1L);
+        assertThat(nonExistingEmployee).isEmpty();
     }
 }
